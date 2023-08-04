@@ -4,34 +4,45 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Assert;
+
 
 public class MyStepdefs {
     private Calculator calculator;
-    private int value1;
-    private int value2;
-    private int result;
+    private int fist;
+    private int second;
+    private char operator;
+    private double result;
+    private String errorMessage;
 
     @Before
     public void before() {
         calculator = new Calculator();
     }
 
-    @Given("Two input values, {int} and {int}")
-    public void twoInputValuesAnd(int arg0, int arg1) {
-        value1 = arg0;
-        value2 = arg1;
+    @Given("Two numbers {int} and {int} and operator {word}")
+    public void twoNumbersFirstAndSecondAndOperatorOpt(int first, int second, String operator) {
+
+        this.fist = first;
+        this.second = second;
+        this.operator = operator.charAt(0);
     }
 
-
-    @When("I add the two values")
-    public void iAddTheTwoValues() {
-        result = calculator.add(value1, value2);
-        System.out.println(value1 + " + " + value2 + " = " + result);
+    @When("I calculate the answer")
+    public void iCalculateTheAnswer() {
+        try {
+            result = calculator.calculate(fist, second, operator);
+        } catch (ArithmeticException | IllegalArgumentException e) {
+            errorMessage = e.getMessage();
+        }
     }
 
-    @Then("I expect the result {int}")
-    public void iExpectTheResult(int arg0) {
-        Assert.assertEquals(arg0, result);
+    @Then("I get {double}")
+    public void iGetAnswer(double answer) {
+        assert result == answer;
+    }
+
+    @Then("I get an error with message {string}")
+    public void iGetAnErrorWithMessageMessage(String message) {
+        assert errorMessage.equals(message);
     }
 }
